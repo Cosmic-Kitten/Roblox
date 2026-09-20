@@ -83,12 +83,15 @@ async function api(request, response, pathname) {
 }
 
 async function staticFile(response, pathname) {
-  const safePath = normalize(pathname === '/' ? '/index.html' : pathname).replace(/^\/+/, '');
+  const requestedPath = pathname === '/' ? '/index.html' : pathname;
+  const safePath = normalize(requestedPath).replace(/^\/+/, '');
   if (safePath.includes('..')) return sendJson(response, 403, {error: 'Forbidden'});
   try {
-    const body = await readFile(join(root, safePath));
+    let filePath = join(root, safePath);
+    try { await readFile(filePath); } catch { filePath = join(root, `${safePath}.html`); }
+    const body = await readFile(filePath);
     const types = {'.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webmanifest': 'application/manifest+json'};
-    response.writeHead(200, {'content-type': types[extname(safePath)] || 'application/octet-stream'});
+    response.writeHead(200, {'content-type': types[extname(filePath)] || 'application/octet-stream'});
     response.end(body);
   } catch { sendJson(response, 404, {error: 'Not found'}); }
 }

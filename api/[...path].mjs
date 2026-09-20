@@ -49,20 +49,26 @@ async function robloxJson(url, options) {
 
 function routeOf(request) {
   const pathname = new URL(request.url, `https://${request.headers.host}`).pathname;
-  const normalized = pathname.replace(/^\/api\/(callback|auth)/, '/$1');
-  return normalized.replace(/^\/callback\//, '/auth/') || '/';
+  if (pathname === '/api/callback/auth' || pathname === '/callback/auth') return '/auth/callback';
+  return pathname.replace(/^\/api\/auth/, '/auth') || '/';
+}
+
+function callbackUri(request) {
+  const origin = `${request.headers['x-forwarded-proto'] || 'https'}://${request.headers.host}`;
+  return new URL('/callback/auth', origin).toString();
 }
 
 export default async function handler(request, response) {
   const route = routeOf(request);
   const url = new URL(request.url, `https://${request.headers.host}`);
+  const activeRedirectUri = callbackUri(request);
   try {
     if (route === '/auth/login') {
       if (!clientId || !clientSecret || !redirectUri || !sessionSecret) return json(response, 500, {error: 'Vercel environment variables are not configured.'});
       const state = randomBytes(24).toString('hex');
       setCookie(response, 'orbit_oauth_state', state, 600);
       const authorize = new URL('https://apis.roblox.com/oauth/v1/authorize');
-      authorize.search = new URLSearchParams({client_id: clientId, response_type: 'code', redirect_uri: redirectUri, scope: 'openid profile', state});
+      authorize.search = new URLSearchParams({client_id: clientId, response_type: 'code', redirect_uri: activeRedirectUri, scope: 'openid profile', state});
       response.statusCode = 302;
       response.setHeader('location', authorize);
       return response.end();
@@ -72,7 +78,7 @@ export default async function handler(request, response) {
       const state = url.searchParams.get('state');
       const code = url.searchParams.get('code');
       if (!state || state !== cookies.orbit_oauth_state || !code) return json(response, 400, {error: 'Invalid OAuth callback state.'});
-      const token = await robloxJson('https://apis.roblox.com/oauth/v1/token', {method: 'POST', headers: {'content-type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({client_id: clientId, client_secret: clientSecret, grant_type: 'authorization_code', code, redirect_uri: redirectUri})});
+      const token = await robloxJson('https://apis.roblox.com/oauth/v1/token', {method: 'POST', headers: {'content-type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({client_id: clientId, client_secret: clientSecret, grant_type: 'authorization_code', code, redirect_uri: activeRedirectUri})});
       const profile = await robloxJson('https://apis.roblox.com/oauth/v1/userinfo', {headers: {authorization: `Bearer ${token.access_token}`} });
       const value = Buffer.from(JSON.stringify({id: profile.sub, name: profile.preferred_username || profile.name || 'Roblox player'})).toString('base64url');
       setCookie(response, 'orbit_profile', signedCookie(value), 604800);
