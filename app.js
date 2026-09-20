@@ -1,5 +1,4 @@
 const SIZE = 8;
-const STORAGE_KEY = 'block-blast-best-score';
 const SHAPES = [
   { color: '#ff6b6b', cells: [[0,0]] },
   { color: '#ffd166', cells: [[0,0],[1,0]] },
@@ -19,6 +18,7 @@ const scoreEl = document.getElementById('scoreValue');
 const messageEl = document.getElementById('message');
 const newGameBtn = document.getElementById('newGameBtn');
 const shuffleBtn = document.getElementById('shuffleBtn');
+let dragGhostEl = null;
 
 const state = {
   board: createBoard(),
@@ -27,11 +27,8 @@ const state = {
   preview: null,
   dragging: false,
   score: 0,
-  moves: 0,
   combo: 1,
-  best: Number(localStorage.getItem(STORAGE_KEY) || 0),
-  gameOver: false,
-  target: 1500
+  gameOver: false
 };
 
 function createBoard() {
@@ -58,6 +55,39 @@ function updateHud() {
 
 function setMessage(text) {
   messageEl.textContent = text;
+}
+
+function createDragGhost(piece, x, y) {
+  removeDragGhost();
+  const maxRow = Math.max(...piece.cells.map(([row]) => row));
+  const maxCol = Math.max(...piece.cells.map(([, col]) => col));
+  const cells = new Set(piece.cells.map(([row, col]) => `${row}:${col}`));
+  dragGhostEl = document.createElement('div');
+  dragGhostEl.className = 'drag-ghost';
+  dragGhostEl.style.gridTemplateColumns = `repeat(${maxCol + 1}, 28px)`;
+  dragGhostEl.style.gridTemplateRows = `repeat(${maxRow + 1}, 28px)`;
+  for (let row = 0; row <= maxRow; row += 1) {
+    for (let col = 0; col <= maxCol; col += 1) {
+      const cell = document.createElement('div');
+      cell.className = 'piece-cell';
+      if (cells.has(`${row}:${col}`)) cell.style.background = piece.color;
+      dragGhostEl.appendChild(cell);
+    }
+  }
+  document.body.appendChild(dragGhostEl);
+  moveDragGhost(x, y);
+}
+
+function moveDragGhost(x, y) {
+  if (dragGhostEl) {
+    dragGhostEl.style.left = `${x}px`;
+    dragGhostEl.style.top = `${y - 34}px`;
+  }
+}
+
+function removeDragGhost() {
+  dragGhostEl?.remove();
+  dragGhostEl = null;
 }
 
 function canPlaceShape(shape, row, col) {
@@ -137,6 +167,7 @@ function renderPreview() {
 
 function updateDragPreview(event) {
   if (!state.dragging || state.selectedPieceIndex === null) return;
+  moveDragGhost(event.clientX, event.clientY);
   const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.cell');
   if (!target) return;
 
@@ -150,6 +181,7 @@ function updateDragPreview(event) {
 function finishDrag(event) {
   if (!state.dragging) return;
   state.dragging = false;
+  removeDragGhost();
   const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.cell');
   if (target) {
     handleBoardClick(Number(target.dataset.row), Number(target.dataset.col));
@@ -281,7 +313,6 @@ function resetGame() {
   state.preview = null;
   state.dragging = false;
   state.score = 0;
-  state.combo = 1;
   state.gameOver = false;
   refillTray();
   setMessage('Pick a piece');
@@ -315,5 +346,6 @@ newGameBtn.addEventListener('click', resetGame);
 shuffleBtn.addEventListener('click', shuffleTray);
 document.addEventListener('pointermove', updateDragPreview);
 document.addEventListener('pointerup', finishDrag);
+document.addEventListener('pointercancel', finishDrag);
 
 resetGame();
