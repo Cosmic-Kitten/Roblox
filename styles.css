@@ -254,6 +254,11 @@ button {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
 }
 
+.piece-selected {
+  transform: translateY(-8px) scale(1.06);
+  filter: brightness(1.12) drop-shadow(0 10px 14px rgba(0,0,0,0.28));
+}
+
 .piece-cell {
   aspect-ratio: 1;
   border-radius: 7px;
