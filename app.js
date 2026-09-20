@@ -16,10 +16,6 @@ const SHAPES = [
 const boardEl = document.getElementById('board');
 const trayEl = document.getElementById('tray');
 const scoreEl = document.getElementById('scoreValue');
-const bestEl = document.getElementById('bestValue');
-const movesEl = document.getElementById('movesValue');
-const comboEl = document.getElementById('comboValue');
-const targetEl = document.getElementById('targetValue');
 const messageEl = document.getElementById('message');
 const newGameBtn = document.getElementById('newGameBtn');
 const shuffleBtn = document.getElementById('shuffleBtn');
@@ -56,20 +52,8 @@ function refillTray() {
   }
 }
 
-function updateBest() {
-  if (state.score > state.best) {
-    state.best = state.score;
-    localStorage.setItem(STORAGE_KEY, String(state.best));
-  }
-  bestEl.textContent = state.best;
-}
-
 function updateHud() {
   scoreEl.textContent = state.score;
-  movesEl.textContent = state.moves;
-  comboEl.textContent = `x${state.combo}`;
-  targetEl.textContent = state.target;
-  updateBest();
 }
 
 function setMessage(text) {
@@ -247,7 +231,8 @@ function renderTray() {
       state.selectedPieceIndex = idx;
       state.dragging = true;
       state.preview = null;
-      setMessage('Drag it onto the board');
+      createDragGhost(piece, event.clientX, event.clientY);
+      setMessage('Release on the board');
       render();
     });
 
@@ -273,18 +258,16 @@ function handleBoardClick(row, col) {
   state.tray.splice(state.selectedPieceIndex, 1);
   state.selectedPieceIndex = null;
   state.preview = null;
-  state.moves += 1;
   clearCompleteLines();
   if (state.tray.length === 0) refillTray();
 
-  if (state.score >= state.target) {
-    state.target += 500;
-    setMessage('Nice! Target raised.');
-  }
-
   if (!hasAnyMove()) {
     state.gameOver = true;
-    setMessage('No moves left — game over!');
+    setMessage('No moves left. Start a new game.');
+  } else if (state.tray.length === 3) {
+    setMessage('New pieces ready.');
+  } else {
+    setMessage('Choose another piece.');
   }
 
   updateHud();
@@ -298,10 +281,8 @@ function resetGame() {
   state.preview = null;
   state.dragging = false;
   state.score = 0;
-  state.moves = 0;
   state.combo = 1;
   state.gameOver = false;
-  state.target = 1500;
   refillTray();
   setMessage('Pick a piece');
   updateHud();
@@ -316,7 +297,7 @@ function shuffleTray() {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   state.tray = copy;
-  setMessage('Pieces shuffled');
+  setMessage('Pieces reordered.');
   render();
 }
 
