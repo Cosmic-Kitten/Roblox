@@ -313,6 +313,7 @@ function resetGame() {
   state.preview = null;
   state.dragging = false;
   state.score = 0;
+  state.combo = 1;
   state.gameOver = false;
   refillTray();
   setMessage('Pick a piece');
