@@ -1,1 +1,17 @@
-{"name":"Orbit Roblox Launcher","short_name":"Orbit","start_url":"./","display":"standalone","background_color":"#171a21","theme_color":"#171a21","description":"A customizable Roblox launcher workspace.","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23171a21'/%3E%3Ccircle cx='96' cy='96' r='57' fill='none' stroke='%23ff755d' stroke-width='14'/%3E%3Ctext x='96' y='113' text-anchor='middle' fill='%23ff755d' font-family='Georgia' font-size='64'%3EO%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}
+{
+  "name": "Block Blast",
+  "short_name": "BlockBlast",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#111827",
+  "description": "A clean Block Blast style arcade game.",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='24' fill='%23111827'/%3E%3Crect x='18' y='18' width='92' height='92' rx='18' fill='%237c9cff'/%3E%3Crect x='36' y='36' width='28' height='28' rx='8' fill='%234dd9c0'/%3E%3Crect x='68' y='36' width='28' height='28' rx='8' fill='%23ff6b6b'/%3E%3Crect x='36' y='68' width='28' height='28' rx='8' fill='%23ffd166'/%3E%3Crect x='68' y='68' width='28' height='28' rx='8' fill='%23a78bfa'/%3E%3C/svg%3E",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -259,6 +259,12 @@ function render() {
   updateHud();
 }
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
 newGameBtn.addEventListener('click', resetGame);
 shuffleBtn.addEventListener('click', shuffleTray);
 
