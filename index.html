@@ -1,36 +1,55 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#171a21">
-  <title>Orbit | Roblox launcher</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="manifest" href="manifest.webmanifest">
-</head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <a class="brand" href="#top" aria-label="Orbit home"><span class="brand-mark">O</span><span>orbit</span></a>
-      <div class="profile-card"><div class="avatar">GU</div><div><strong id="profileName">Guest mode</strong><span id="profileStatus">Local preview</span></div><button class="icon-button" id="profileMenu" aria-label="Profile options">•••</button></div>
-      <nav class="main-nav" aria-label="Main navigation"><button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span>Home</button><button class="nav-item" data-view="discover"><span class="nav-icon">◉</span>Discover</button><button class="nav-item" data-view="library"><span class="nav-icon">▦</span>My library <span class="nav-count">8</span></button><button class="nav-item" data-view="recent"><span class="nav-icon">↺</span>Recently played</button></nav>
-      <div class="sidebar-section"><span class="eyebrow">Collections</span><button class="collection-item"><i class="dot coral"></i>Weekend rotation</button><button class="collection-item"><i class="dot cyan"></i>Cozy nights</button><button class="collection-item"><i class="dot yellow"></i>With friends</button><button class="add-collection" id="addCollection">＋ New collection</button></div>
-      <div class="sidebar-bottom"><button class="nav-item" id="settingsButton"><span class="nav-icon">⚙</span>Customize</button><a class="legal-link" href="https://www.roblox.com/" target="_blank" rel="noreferrer">Open roblox.com ↗</a></div>
-    </aside>
-    <main class="main-content" id="top">
-      <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="viewLabel">Home</strong></div><div class="top-actions"><button class="search-trigger" id="searchTrigger"><span>⌕</span><span>Search experiences</span><kbd>/</kbd></button><button class="icon-button notification" aria-label="Notifications">♢<i></i></button><button class="connect-button" id="connectButton"><span class="status-dot"></span>Connect Roblox</button></div></header>
-      <section class="hero-section"><div class="hero-copy"><p class="eyebrow accent">GOOD EVENING, EXPLORER</p><h1>Pick up where<br><em>you left off.</em></h1><p class="hero-subtitle">Your games, your rhythm. A calmer way to find your next favorite world.</p><div class="hero-actions"><button class="primary-button" id="resumeButton">▶ Resume Brookhaven</button><button class="ghost-button" id="surpriseButton">Surprise me <span>↗</span></button></div></div><div class="hero-art"><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-star star-one">✦</div><div class="art-star star-two">✦</div><div class="art-label"><span class="pulse"></span> LAST PLAYED 2H AGO</div><div class="art-card"><span class="art-card-top">BROOKHAVEN</span><strong>RP</strong><span class="art-card-bottom">24.8K PLAYING</span></div></div></section>
-      <section class="content-section" id="continueSection"><div class="section-heading"><div><p class="eyebrow">YOUR ROTATION</p><h2>Continue playing</h2></div><button class="text-button" id="viewAllButton">View all <span>→</span></button></div><div class="game-grid" id="continueGrid"></div></section>
-      <section class="content-section discover-section"><div class="section-heading"><div><p class="eyebrow">HANDPICKED FOR YOU</p><h2>Worth a look</h2></div><div class="filter-tabs"><button class="filter-tab active" data-filter="all">All</button><button class="filter-tab" data-filter="popular">Popular</button><button class="filter-tab" data-filter="new">New & rising</button></div></div><div class="game-grid" id="discoverGrid"></div></section>
-      <footer class="footer"><span>ORBIT LAUNCHER <b>0.4.0</b></span><span class="footer-note"><i class="secure-dot"></i> Your account stays on Roblox</span></footer>
-    </main>
-  </div>
-  <div class="toast" id="toast" role="status"></div>
-  <dialog class="customize-dialog" id="customizeDialog"><div class="dialog-head"><div><p class="eyebrow accent">PERSONAL SPACE</p><h2>Make it yours</h2></div><button class="close-button" id="closeDialog" aria-label="Close">×</button></div><div class="setting-row"><div><strong>Accent color</strong><span>Choose your signal</span></div><div class="swatches"><button class="swatch coral active" data-color="#ff755d" aria-label="Coral"></button><button class="swatch cyan" data-color="#65d7d1" aria-label="Cyan"></button><button class="swatch yellow" data-color="#f7ce68" aria-label="Yellow"></button><button class="swatch violet" data-color="#a88cff" aria-label="Violet"></button></div></div><div class="setting-row"><div><strong>Compact cards</strong><span>Fit more games in view</span></div><label class="switch"><input type="checkbox" id="compactToggle"><span></span></label></div><div class="setting-row"><div><strong>Background grain</strong><span>Add a little texture</span></div><label class="switch"><input type="checkbox" id="grainToggle" checked><span></span></label></div><button class="primary-button dialog-done" id="doneDialog">Save preferences</button></dialog>
-  <div class="search-overlay" id="searchOverlay" hidden><div class="search-panel"><div class="search-input-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="Search games, genres, creators..." autofocus><kbd>ESC</kbd></div><div class="search-results" id="searchResults"></div></div></div>
-  <script src="app.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111827" />
+    <title>Block Blast</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="game-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Arcade</p>
+          <h1>Block Blast</h1>
+        </div>
+        <div class="top-actions">
+          <button id="newGameBtn" class="ghost-button">New game</button>
+          <button id="shuffleBtn" class="primary-button">Shuffle</button>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <section class="panel board-panel">
+          <div class="score-row">
+            <div class="stat-box">
+              <span>Score</span>
+              <strong id="scoreValue">0</strong>
+            </div>
+            <div class="stat-box">
+              <span>Best</span>
+              <strong id="bestValue">0</strong>
+            </div>
+            <div class="stat-box">
+              <span>Moves</span>
+              <strong id="movesValue">0</strong>
+            </div>
+          </div>
+
+          <div id="board" class="board" aria-label="Game board"></div>
+        </section>
+
+        <aside class="panel tray-panel">
+          <div class="tray-header">
+            <h2>Pieces</h2>
+            <span id="message" class="message">Pick a piece</span>
+          </div>
+          <div id="tray" class="tray"></div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
 </html>

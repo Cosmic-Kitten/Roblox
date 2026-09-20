@@ -1,11 +1,265 @@
-const games=[['Brookhaven RP','Roleplay','24.8K','cover-one','popular'],['Dress To Impress','Fashion','18.2K','cover-two','popular'],['Grow a Garden','Simulator','31.4K','cover-three','new'],['Fisch','Adventure','12.1K','cover-four','popular'],['Rivals','Shooter','45.7K','cover-five','popular'],['99 Nights in the Forest','Survival','9.8K','cover-six','new'],['Adopt Me!','Roleplay','28.3K','cover-seven','popular'],['Murder Mystery 2','Action','16.6K','cover-eight','popular']];
-const $=s=>document.querySelector(s), toast=m=>{const n=$('#toast');n.textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2200)};
-function card(g){return `<article class="game-card" data-name="${g[0].toLowerCase()}" data-tag="${g[4]}" data-game="${g[0]}"><div class="game-cover ${g[3]}"><span class="cover-title">${g[0]}</span><button class="play-mini" aria-label="Launch ${g[0]}">▶</button></div><div class="game-meta"><div><div class="game-name">${g[0]}</div><div class="game-genre">${g[1]}</div></div><div class="players">${g[2]} ●</div></div></article>`}
-function render(s,list){$(s).innerHTML=list.map(card).join('')}render('#continueGrid',games.slice(0,4));render('#discoverGrid',games.slice(2));
-document.addEventListener('click',e=>{const game=e.target.closest('.game-card');if(game){toast(`Opening ${game.dataset.game} on Roblox...`);window.open('https://www.roblox.com/discover','_blank','noopener')}const nav=e.target.closest('.nav-item[data-view]');if(nav){const view=nav.dataset.view;document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));nav.classList.add('active');$('#viewLabel').textContent=nav.textContent.trim();if(view==='discover'){$('#continueSection').hidden=true;$('.discover-section').scrollIntoView({behavior:'smooth'})}else{$('#continueSection').hidden=false;if(view==='library')render('#continueGrid',games.slice(0,4));if(view==='recent')render('#continueGrid',games.slice(0,3));$('#continueSection').scrollIntoView({behavior:'smooth'})}toast(`${$('#viewLabel').textContent} view selected`)}});
-$('#connectButton').onclick=async()=>{try{const response=await fetch('/api/session');const data=await response.json();if(data.oauthConfigured===false){toast('Add Roblox OAuth values to .env, then run npm start');return}window.location.href='/auth/login'}catch{window.open('https://www.roblox.com/login','_blank','noopener');toast('Roblox opened in a new tab. Sign in there, then return here.')}};$('#resumeButton').onclick=()=>{window.open('https://www.roblox.com/games/4924922222/Brookhaven-RP','_blank','noopener');toast('Launching Brookhaven RP...')};$('#surpriseButton').onclick=()=>toast(`Your surprise: ${games[Math.floor(Math.random()*games.length)][0]}`);$('#viewAllButton').onclick=()=>{$('#continueSection').hidden=false;$('#continueSection').scrollIntoView({behavior:'smooth'})};
-const dialog=$('#customizeDialog');$('#settingsButton').onclick=()=>dialog.showModal();$('#closeDialog').onclick=()=>dialog.close();$('#doneDialog').onclick=()=>{dialog.close();toast('Preferences saved locally')};document.querySelectorAll('.swatch').forEach(s=>s.onclick=()=>{document.documentElement.style.setProperty('--accent',s.dataset.color);document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));s.classList.add('active')});$('#compactToggle').onchange=e=>document.querySelectorAll('.game-cover').forEach(c=>c.style.height=e.target.checked?'105px':'143px');$('#grainToggle').onchange=e=>document.body.classList.toggle('no-grain',!e.target.checked);
-const overlay=$('#searchOverlay'),input=$('#searchInput'),results=$('#searchResults');function openSearch(){overlay.hidden=false;input.value='';input.focus();results.innerHTML='<div class="empty-result">Start typing to search your launcher</div>'}function closeSearch(){overlay.hidden=true}$('#searchTrigger').onclick=openSearch;overlay.onclick=e=>{if(e.target===overlay)closeSearch()};document.onkeydown=e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();openSearch()}if(e.key==='Escape')closeSearch()};input.oninput=()=>{const q=input.value.toLowerCase().trim(),found=games.filter(g=>g[0].toLowerCase().includes(q)||g[1].toLowerCase().includes(q));results.innerHTML=found.length?found.map(g=>`<div class="result" data-result="${g[0]}"><strong>${g[0]}</strong><small>${g[1]} · ${g[2]} playing</small></div>`).join(''):'<div class="empty-result">No experiences found in this launcher</div>'};results.onclick=e=>{const item=e.target.closest('[data-result]');if(item){closeSearch();toast(`Opening ${item.dataset.result} on Roblox...`);window.open('https://www.roblox.com/discover','_blank','noopener')}};
-document.querySelectorAll('.filter-tab').forEach(tab=>tab.onclick=()=>{document.querySelectorAll('.filter-tab').forEach(x=>x.classList.remove('active'));tab.classList.add('active');render('#discoverGrid',tab.dataset.filter==='all'?games.slice(2):games.filter(g=>g[4]===tab.dataset.filter))});$('#addCollection').onclick=()=>toast('Collection creation is ready for your next session');$('#profileMenu').onclick=()=>toast('Guest mode: connect through Roblox to personalize your profile');
-let installPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;toast('Orbit is ready to install from your browser menu')});if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
-async function loadSession(){try{const response=await fetch('/api/session');const data=await response.json();if(data.authenticated){$('#profileName').textContent=data.profile.name;$('#profileStatus').textContent='Roblox connected';$('#connectButton').innerHTML='<span class="status-dot"></span>Connected';$('#connectButton').classList.add('connected');const experiences=await fetch('/api/experiences');if(experiences.ok){const payload=await experiences.json();const remote=[...payload.favorites,...payload.created].slice(0,8).map((game,index)=>[game.name||'Untitled experience','Roblox experience',`${game.placeVisits||0} visits`,`cover-${(index%8)+1}`,index<4?'popular':'new']);if(remote.length){render('#continueGrid',remote.slice(0,4));render('#discoverGrid',remote.slice(4));}}}}catch(error){console.warn('Roblox session unavailable',error)}}loadSession();
+const SIZE = 8;
+const STORAGE_KEY = 'block-blast-best-score';
+const SHAPES = [
+  { color: '#ff6b6b', cells: [[0, 0]] },
+  { color: '#ffd166', cells: [[0, 0], [1, 0]] },
+  { color: '#06d6a0', cells: [[0, 0], [0, 1], [1, 0]] },
+  { color: '#4cc9f0', cells: [[0, 0], [1, 0], [2, 0]] },
+  { color: '#a78bfa', cells: [[0, 0], [1, 0], [1, 1]] },
+  { color: '#f72585', cells: [[0, 0], [1, 0], [2, 0], [1, 1]] },
+  { color: '#7c9cff', cells: [[0, 0], [1, 0], [0, 1], [1, 1]] },
+  { color: '#ff9f1c', cells: [[0, 0], [1, 0], [2, 0], [2, 1]] },
+  { color: '#2dd4bf', cells: [[0, 0], [1, 0], [1, 1], [2, 1]] },
+  { color: '#f472b6', cells: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1]] }
+];
+
+const boardEl = document.getElementById('board');
+const trayEl = document.getElementById('tray');
+const scoreEl = document.getElementById('scoreValue');
+const bestEl = document.getElementById('bestValue');
+const movesEl = document.getElementById('movesValue');
+const messageEl = document.getElementById('message');
+const newGameBtn = document.getElementById('newGameBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
+
+const state = {
+  board: createBoard(),
+  tray: [],
+  selectedPieceIndex: null,
+  score: 0,
+  moves: 0,
+  best: Number(localStorage.getItem(STORAGE_KEY) || 0),
+  gameOver: false
+};
+
+function createBoard() {
+  return Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
+}
+
+function randomShape() {
+  const template = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+  return {
+    color: template.color,
+    cells: template.cells.map(([r, c]) => [r, c])
+  };
+}
+
+function refillTray() {
+  while (state.tray.length < 3) {
+    state.tray.push(randomShape());
+  }
+}
+
+function cloneBoard() {
+  return state.board.map(row => [...row]);
+}
+
+function updateBest() {
+  if (state.score > state.best) {
+    state.best = state.score;
+    localStorage.setItem(STORAGE_KEY, String(state.best));
+  }
+  bestEl.textContent = state.best;
+}
+
+function updateHud() {
+  scoreEl.textContent = state.score;
+  movesEl.textContent = state.moves;
+  updateBest();
+}
+
+function setMessage(text) {
+  messageEl.textContent = text;
+}
+
+function canPlaceShape(shape, row, col) {
+  if (state.gameOver) return false;
+  for (const [dr, dc] of shape.cells) {
+    const r = row + dr;
+    const c = col + dc;
+    if (r < 0 || r >= SIZE || c < 0 || c >= SIZE) return false;
+    if (state.board[r][c]) return false;
+  }
+  return true;
+}
+
+function clearCompleteLines() {
+  let cleared = 0;
+
+  for (let r = 0; r < SIZE; r += 1) {
+    if (state.board[r].every(Boolean)) {
+      state.board[r].fill(null);
+      cleared += 1;
+    }
+  }
+
+  for (let c = 0; c < SIZE; c += 1) {
+    const full = state.board.every(row => row[c]);
+    if (full) {
+      for (let r = 0; r < SIZE; r += 1) {
+        state.board[r][c] = null;
+      }
+      cleared += 1;
+    }
+  }
+
+  if (cleared > 0) {
+    state.score += cleared * 100;
+    setMessage(`Cleared ${cleared} line${cleared > 1 ? 's' : ''}!`);
+  }
+}
+
+function hasAnyMove() {
+  for (const piece of state.tray) {
+    for (let row = 0; row < SIZE; row += 1) {
+      for (let col = 0; col < SIZE; col += 1) {
+        if (canPlaceShape(piece, row, col)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function renderBoard() {
+  boardEl.innerHTML = '';
+
+  for (let row = 0; row < SIZE; row += 1) {
+    for (let col = 0; col < SIZE; col += 1) {
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'cell';
+      const value = state.board[row][col];
+      if (value) {
+        cell.classList.add('filled');
+        cell.style.background = value;
+      }
+      cell.dataset.row = String(row);
+      cell.dataset.col = String(col);
+      cell.addEventListener('click', () => handleBoardClick(row, col));
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+function renderTray() {
+  trayEl.innerHTML = '';
+
+  state.tray.forEach((piece, idx) => {
+    const pieceWrap = document.createElement('div');
+    pieceWrap.className = 'piece-grid';
+    pieceWrap.setAttribute('title', 'Select piece');
+    pieceWrap.style.borderColor = state.selectedPieceIndex === idx ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.08)';
+    pieceWrap.style.background = state.selectedPieceIndex === idx ? 'rgba(124,156,255,0.12)' : 'rgba(255,255,255,0.02)';
+
+    const mini = document.createElement('div');
+    mini.className = 'piece';
+    mini.style.background = piece.color;
+    mini.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    mini.style.gridTemplateRows = 'repeat(3, 1fr)';
+    mini.style.display = 'grid';
+    mini.style.position = 'relative';
+    mini.style.cursor = 'pointer';
+
+    const maxRow = Math.max(...piece.cells.map(([r]) => r));
+    const maxCol = Math.max(...piece.cells.map(([, c]) => c));
+    const cellMap = new Map(piece.cells.map(([r, c]) => [`${r}:${c}`, [r, c]]));
+
+    for (let r = 0; r <= Math.max(2, maxRow); r += 1) {
+      for (let c = 0; c <= Math.max(2, maxCol); c += 1) {
+        const cell = document.createElement('div');
+        cell.className = 'piece-cell';
+        if (cellMap.has(`${r}:${c}`)) {
+          cell.style.background = piece.color;
+          cell.style.borderRadius = '8px';
+        } else {
+          cell.style.background = 'transparent';
+        }
+        mini.appendChild(cell);
+      }
+    }
+
+    mini.addEventListener('click', () => {
+      state.selectedPieceIndex = state.selectedPieceIndex === idx ? null : idx;
+      setMessage(state.selectedPieceIndex === null ? 'Pick a piece' : 'Click a spot on the board');
+      render();
+    });
+
+    pieceWrap.appendChild(mini);
+    trayEl.appendChild(pieceWrap);
+  });
+}
+
+function handleBoardClick(row, col) {
+  if (state.gameOver || state.selectedPieceIndex === null) {
+    setMessage('Select a piece first');
+    return;
+  }
+
+  const piece = state.tray[state.selectedPieceIndex];
+  if (!piece) return;
+
+  if (!canPlaceShape(piece, row, col)) {
+    setMessage('That spot is blocked. Try another spot.');
+    return;
+  }
+
+  for (const [dr, dc] of piece.cells) {
+    const r = row + dr;
+    const c = col + dc;
+    state.board[r][c] = piece.color;
+  }
+
+  state.tray.splice(state.selectedPieceIndex, 1);
+  state.selectedPieceIndex = null;
+  state.moves += 1;
+
+  clearCompleteLines();
+  refillTray();
+
+  if (!hasAnyMove()) {
+    state.gameOver = true;
+    setMessage('No moves left — game over!');
+  } else {
+    setMessage('Nice move!');
+  }
+
+  updateHud();
+  render();
+}
+
+function resetGame() {
+  state.board = createBoard();
+  state.tray = [];
+  state.selectedPieceIndex = null;
+  state.score = 0;
+  state.moves = 0;
+  state.gameOver = false;
+  refillTray();
+  setMessage('Pick a piece');
+  updateHud();
+  render();
+}
+
+function shuffleTray() {
+  if (state.gameOver) return;
+  state.tray = state.tray.map(piece => ({ ...piece, cells: [...piece.cells.map(([r, c]) => [r, c])] }));
+  for (let i = state.tray.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [state.tray[i], state.tray[j]] = [state.tray[j], state.tray[i]];
+  }
+  setMessage('Pieces shuffled');
+  render();
+}
+
+function render() {
+  renderBoard();
+  renderTray();
+  updateHud();
+}
+
+newGameBtn.addEventListener('click', resetGame);
+shuffleBtn.addEventListener('click', shuffleTray);
+
+resetGame();
