@@ -254,7 +254,7 @@ function renderTray() {
     const mini = document.createElement('div');
     mini.className = 'piece';
     if (state.selectedPieceIndex === idx) mini.classList.add('piece-selected');
-    mini.style.background = piece.color;
+    mini.style.background = 'transparent';
     mini.style.display = 'grid';
     mini.style.gridTemplateColumns = 'repeat(3, 1fr)';
     mini.style.gridTemplateRows = 'repeat(3, 1fr)';
