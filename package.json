@@ -2,6 +2,6 @@
   "name": "orbit-roblox-launcher",
   "private": true,
   "type": "module",
-  "scripts": {"start": "node server.mjs"},
+  "scripts": {"start": "node --env-file=.env server.mjs"},
   "engines": {"node": ">=20"}
 }
