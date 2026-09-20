@@ -97,9 +97,11 @@ createServer(async (request, response) => {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
   const pathname = requestUrl.pathname;
   const authPath = pathname.startsWith('/api/auth') ? pathname.replace(/^\/api\/auth/, '/auth') : pathname;
+  const callbackPath = pathname.startsWith('/api/callback') ? pathname.replace(/^\/api\/callback/, '/callback') : pathname;
+  const normalizedPath = callbackPath === '/callback/auth' ? '/auth/callback' : authPath;
   try {
-    if (authPath === '/auth/login') return startLogin(response);
-    if (authPath === '/auth/callback') return await finishLogin(request, response, requestUrl);
+    if (normalizedPath === '/auth/login') return startLogin(response);
+    if (normalizedPath === '/auth/callback' || callbackPath === '/callback/auth') return await finishLogin(request, response, requestUrl);
     if (pathname.startsWith('/api/')) return await api(request, response, pathname);
     await staticFile(response, pathname);
   } catch (error) { sendJson(response, 502, {error: error.message}); }

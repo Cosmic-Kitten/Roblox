@@ -49,7 +49,8 @@ async function robloxJson(url, options) {
 
 function routeOf(request) {
   const pathname = new URL(request.url, `https://${request.headers.host}`).pathname;
-  return pathname.replace(/^\/api/, '') || '/';
+  const normalized = pathname.replace(/^\/api\/(callback|auth)/, '/$1');
+  return normalized.replace(/^\/callback\//, '/auth/') || '/';
 }
 
 export default async function handler(request, response) {
