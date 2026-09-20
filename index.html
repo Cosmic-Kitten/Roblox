@@ -13,7 +13,7 @@
   <body>
     <div class="game-shell">
       <header class="topbar">
-        <div>
+        <div class="brand-wrap">
           <p class="eyebrow">Arcade</p>
           <h1>Block Blast</h1>
         </div>
@@ -22,6 +22,12 @@
           <button id="shuffleBtn" class="primary-button">Shuffle</button>
         </div>
       </header>
+
+      <div class="status-row">
+        <div class="status-pill"><span>Target</span><strong id="targetValue">1500</strong></div>
+        <div class="status-pill"><span>Combo</span><strong id="comboValue">x1</strong></div>
+        <div class="status-pill"><span>Moves</span><strong id="movesValue">0</strong></div>
+      </div>
 
       <main class="game-layout">
         <section class="panel board-panel">
@@ -33,10 +39,6 @@
             <div class="stat-box">
               <span>Best</span>
               <strong id="bestValue">0</strong>
-            </div>
-            <div class="stat-box">
-              <span>Moves</span>
-              <strong id="movesValue">0</strong>
             </div>
           </div>
 

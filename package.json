@@ -2,6 +2,9 @@
   "name": "orbit-roblox-launcher",
   "private": true,
   "type": "module",
-  "scripts": {"start": "node --env-file=.env server.mjs"},
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "auto-sync": "bash ./scripts/auto-sync.sh"
+  },
   "engines": {"node": ">=20"}
 }
