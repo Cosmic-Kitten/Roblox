@@ -28,6 +28,7 @@ const state = {
   board: createBoard(),
   tray: [],
   selectedPieceIndex: null,
+  preview: null,
   score: 0,
   moves: 0,
   combo: 1,
@@ -141,6 +142,16 @@ function renderBoard() {
         cell.classList.add('filled');
         cell.style.background = value;
       }
+      if (state.preview && state.preview.row === row && state.preview.col === col) {
+        const previewPiece = state.tray[state.selectedPieceIndex];
+        cell.classList.add(previewPiece && canPlaceShape(previewPiece, row, col) ? 'preview-valid' : 'preview-invalid');
+      }
+      cell.addEventListener('mouseenter', () => {
+        if (state.selectedPieceIndex !== null) {
+          state.preview = { row, col };
+          renderBoard();
+        }
+      });
       cell.addEventListener('click', () => handleBoardClick(row, col));
       boardEl.appendChild(cell);
     }
@@ -178,6 +189,7 @@ function renderTray() {
 
     mini.addEventListener('click', () => {
       state.selectedPieceIndex = state.selectedPieceIndex === idx ? null : idx;
+      state.preview = null;
       setMessage(state.selectedPieceIndex === null ? 'Pick a piece' : 'Click a board spot');
       render();
     });
@@ -200,11 +212,13 @@ function handleBoardClick(row, col) {
   }
 
   placePieceAt(row, col, piece);
+  state.score += piece.cells.length * 10;
   state.tray.splice(state.selectedPieceIndex, 1);
   state.selectedPieceIndex = null;
+  state.preview = null;
   state.moves += 1;
   clearCompleteLines();
-  refillTray();
+  if (state.tray.length === 0) refillTray();
 
   if (state.score >= state.target) {
     state.target += 500;
@@ -224,6 +238,7 @@ function resetGame() {
   state.board = createBoard();
   state.tray = [];
   state.selectedPieceIndex = null;
+  state.preview = null;
   state.score = 0;
   state.moves = 0;
   state.combo = 1;
