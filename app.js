@@ -29,6 +29,7 @@ const state = {
   tray: [],
   selectedPieceIndex: null,
   preview: null,
+  dragging: false,
   score: 0,
   moves: 0,
   combo: 1,
@@ -137,10 +138,40 @@ function renderPreview() {
   if (!state.preview) return;
 
   const { row, col } = state.preview;
-  const cell = boardEl.children[row * SIZE + col];
   const piece = state.tray[state.selectedPieceIndex];
-  if (cell && piece) {
-    cell.classList.add(canPlaceShape(piece, row, col) ? 'preview-valid' : 'preview-invalid');
+  if (!piece) return;
+
+  const valid = canPlaceShape(piece, row, col);
+  piece.cells.forEach(([dr, dc]) => {
+    const previewRow = row + dr;
+    const previewCol = col + dc;
+    if (previewRow >= 0 && previewRow < SIZE && previewCol >= 0 && previewCol < SIZE) {
+      boardEl.children[previewRow * SIZE + previewCol]?.classList.add(valid ? 'preview-valid' : 'preview-invalid');
+    }
+  });
+}
+
+function updateDragPreview(event) {
+  if (!state.dragging || state.selectedPieceIndex === null) return;
+  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.cell');
+  if (!target) return;
+
+  const nextPreview = { row: Number(target.dataset.row), col: Number(target.dataset.col) };
+  if (!state.preview || state.preview.row !== nextPreview.row || state.preview.col !== nextPreview.col) {
+    state.preview = nextPreview;
+    renderPreview();
+  }
+}
+
+function finishDrag(event) {
+  if (!state.dragging) return;
+  state.dragging = false;
+  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.cell');
+  if (target) {
+    handleBoardClick(Number(target.dataset.row), Number(target.dataset.col));
+  } else {
+    state.preview = null;
+    render();
   }
 }
 
@@ -151,6 +182,8 @@ function renderBoard() {
       const cell = document.createElement('button');
       cell.type = 'button';
       cell.className = 'cell';
+      cell.dataset.row = row;
+      cell.dataset.col = col;
       const value = state.board[row][col];
       if (value) {
         cell.classList.add('filled');
@@ -205,6 +238,16 @@ function renderTray() {
       state.selectedPieceIndex = state.selectedPieceIndex === idx ? null : idx;
       state.preview = null;
       setMessage(state.selectedPieceIndex === null ? 'Pick a piece' : 'Click a board spot');
+      render();
+    });
+
+    mini.addEventListener('pointerdown', event => {
+      if (state.gameOver) return;
+      event.preventDefault();
+      state.selectedPieceIndex = idx;
+      state.dragging = true;
+      state.preview = null;
+      setMessage('Drag it onto the board');
       render();
     });
 
