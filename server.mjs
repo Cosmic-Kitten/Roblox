@@ -95,10 +95,12 @@ async function staticFile(response, pathname) {
 
 createServer(async (request, response) => {
   const requestUrl = new URL(request.url, `http://${request.headers.host}`);
+  const pathname = requestUrl.pathname;
+  const authPath = pathname.startsWith('/api/auth') ? pathname.replace(/^\/api\/auth/, '/auth') : pathname;
   try {
-    if (requestUrl.pathname === '/auth/login') return startLogin(response);
-    if (requestUrl.pathname === '/auth/callback') return await finishLogin(request, response, requestUrl);
-    if (requestUrl.pathname.startsWith('/api/')) return await api(request, response, requestUrl.pathname);
-    await staticFile(response, requestUrl.pathname);
+    if (authPath === '/auth/login') return startLogin(response);
+    if (authPath === '/auth/callback') return await finishLogin(request, response, requestUrl);
+    if (pathname.startsWith('/api/')) return await api(request, response, pathname);
+    await staticFile(response, pathname);
   } catch (error) { sendJson(response, 502, {error: error.message}); }
 }).listen(port, () => console.log(`Orbit listening at http://localhost:${port}`));
