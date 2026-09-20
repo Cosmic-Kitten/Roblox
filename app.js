@@ -1,4 +1,14 @@
 const SIZE = 8;
+const PALETTES = Array.from({ length: 180 }, (_, index) => {
+  const hue = (index * 47) % 360;
+  return [
+    `hsl(${hue} 88% 66%)`,
+    `hsl(${(hue + 38) % 360} 86% 62%)`,
+    `hsl(${(hue + 126) % 360} 78% 58%)`,
+    `hsl(${(hue + 202) % 360} 84% 68%)`,
+    `hsl(${(hue + 286) % 360} 82% 64%)`
+  ];
+});
 const SHAPES = [
   { color: '#ff6b6b', cells: [[0,0]] },
   { color: '#ffd166', cells: [[0,0],[1,0]] },
@@ -28,6 +38,7 @@ const state = {
   dragging: false,
   score: 0,
   combo: 1,
+  paletteIndex: 0,
   gameOver: false
 };
 
@@ -37,8 +48,9 @@ function createBoard() {
 
 function randomShape() {
   const template = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+  const palette = PALETTES[state.paletteIndex];
   return {
-    color: template.color,
+    color: palette[Math.floor(Math.random() * palette.length)],
     cells: template.cells.map(([r, c]) => [r, c])
   };
 }
@@ -55,6 +67,14 @@ function updateHud() {
 
 function setMessage(text) {
   messageEl.textContent = text;
+}
+
+function changePalette() {
+  state.paletteIndex = (state.paletteIndex + 1) % PALETTES.length;
+  const palette = PALETTES[state.paletteIndex];
+  state.board = state.board.map((line, row) => line.map((value, col) => (
+    value ? palette[(row * SIZE + col) % palette.length] : null
+  )));
 }
 
 function createDragGhost(piece, x, y) {
@@ -120,10 +140,12 @@ function clearCompleteLines() {
     const bonus = 100 * cleared * state.combo;
     state.score += bonus;
     state.combo = Math.min(9, state.combo + 1);
-    setMessage(`Cleared ${cleared} line${cleared > 1 ? 's' : ''}! +${bonus}`);
+    changePalette();
+    setMessage(`Cleared ${cleared} line${cleared > 1 ? 's' : ''}. Palette ${state.paletteIndex + 1}/180.`);
   } else {
     state.combo = 1;
   }
+  return cleared;
 }
 
 function hasAnyMove() {
@@ -231,6 +253,7 @@ function renderTray() {
 
     const mini = document.createElement('div');
     mini.className = 'piece';
+    if (state.selectedPieceIndex === idx) mini.classList.add('piece-selected');
     mini.style.background = piece.color;
     mini.style.display = 'grid';
     mini.style.gridTemplateColumns = 'repeat(3, 1fr)';
@@ -290,12 +313,14 @@ function handleBoardClick(row, col) {
   state.tray.splice(state.selectedPieceIndex, 1);
   state.selectedPieceIndex = null;
   state.preview = null;
-  clearCompleteLines();
+  const cleared = clearCompleteLines();
   if (state.tray.length === 0) refillTray();
 
   if (!hasAnyMove()) {
     state.gameOver = true;
     setMessage('No moves left. Start a new game.');
+  } else if (cleared > 0) {
+    setMessage(`Cleared ${cleared} line${cleared > 1 ? 's' : ''}. Palette ${state.paletteIndex + 1}/180.`);
   } else if (state.tray.length === 3) {
     setMessage('New pieces ready.');
   } else {
@@ -314,6 +339,7 @@ function resetGame() {
   state.dragging = false;
   state.score = 0;
   state.combo = 1;
+  state.paletteIndex = 0;
   state.gameOver = false;
   refillTray();
   setMessage('Pick a piece');
