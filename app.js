@@ -296,6 +296,7 @@ function resetGame() {
   state.tray = [];
   state.selectedPieceIndex = null;
   state.preview = null;
+  state.dragging = false;
   state.score = 0;
   state.moves = 0;
   state.combo = 1;
@@ -331,5 +332,7 @@ if ('serviceWorker' in navigator) {
 
 newGameBtn.addEventListener('click', resetGame);
 shuffleBtn.addEventListener('click', shuffleTray);
+document.addEventListener('pointermove', updateDragPreview);
+document.addEventListener('pointerup', finishDrag);
 
 resetGame();
