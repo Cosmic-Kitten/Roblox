@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 4173",
-    "auto-sync": "bash ./scripts/auto-sync.sh"
+    "auto-sync": "bash ./scripts/auto-sync.sh",
+    "auto-sync:watch": "bash ./scripts/auto-sync-watch.sh"
   },
   "engines": {"node": ">=20"}
 }
