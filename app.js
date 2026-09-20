@@ -90,7 +90,7 @@ function createDragGhost(piece, x, y) {
     for (let col = 0; col <= maxCol; col += 1) {
       const cell = document.createElement('div');
       cell.className = 'piece-cell';
-      if (cells.has(`${row}:${col}`)) cell.style.background = piece.color;
+      if (cells.has(`${row}:${col}`)) cell.style.backgroundColor = piece.color;
       dragGhostEl.appendChild(cell);
     }
   }
@@ -268,7 +268,7 @@ function renderTray() {
       for (let c = 0; c <= Math.max(2, maxCol); c += 1) {
         const node = document.createElement('div');
         node.className = 'piece-cell';
-        node.style.background = cellsMap.has(`${r}:${c}`) ? piece.color : 'transparent';
+        node.style.backgroundColor = cellsMap.has(`${r}:${c}`) ? piece.color : 'transparent';
         mini.appendChild(node);
       }
     }
