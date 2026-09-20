@@ -130,6 +130,20 @@ function placePieceAt(row, col, piece) {
   }
 }
 
+function renderPreview() {
+  Array.from(boardEl.children).forEach(cell => {
+    cell.classList.remove('preview-valid', 'preview-invalid');
+  });
+  if (!state.preview) return;
+
+  const { row, col } = state.preview;
+  const cell = boardEl.children[row * SIZE + col];
+  const piece = state.tray[state.selectedPieceIndex];
+  if (cell && piece) {
+    cell.classList.add(canPlaceShape(piece, row, col) ? 'preview-valid' : 'preview-invalid');
+  }
+}
+
 function renderBoard() {
   boardEl.innerHTML = '';
   for (let row = 0; row < SIZE; row += 1) {
@@ -149,7 +163,7 @@ function renderBoard() {
       cell.addEventListener('mouseenter', () => {
         if (state.selectedPieceIndex !== null) {
           state.preview = { row, col };
-          renderBoard();
+          renderPreview();
         }
       });
       cell.addEventListener('click', () => handleBoardClick(row, col));
