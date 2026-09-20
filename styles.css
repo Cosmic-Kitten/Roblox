@@ -291,6 +291,7 @@ button {
   .status-pill strong { font-size: 1rem; }
   .board-panel,
   .tray-panel { padding: 12px; }
+  .game-layout { padding-bottom: 154px; }
   .score-row { margin-bottom: 12px; gap: 8px; }
   .stat-box { padding: 9px 10px; }
   .stat-box strong { font-size: 1.45rem; }
@@ -298,6 +299,17 @@ button {
   .tray { gap: 8px; }
   .piece-grid { min-height: 88px; padding: 8px; }
   .tray-header { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .tray-panel {
+    position: fixed;
+    z-index: 10;
+    left: 50%;
+    bottom: 8px;
+    width: calc(100vw - 16px);
+    max-width: 520px;
+    transform: translateX(-50%);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.42);
+    backdrop-filter: blur(16px);
+  }
 }
 
 @media (max-width: 390px) {
